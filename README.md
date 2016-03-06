@@ -1,5 +1,7 @@
 # Portable Environment Initialization Scripts (for Windows)
 
+Console application that generates scripts for initializing environment variables for different windows shells: batch, bash and powershell.
+
 ## Who needs this?
 
 Are you a programmer working on Windows? Do you need to work with multiple toolchains/environment variables configurations in console? Do you use different shells available for windows: batch, bash, powershell? Do you have trouble maintaining multiple different environemt manipulation scripts? Don't want to pollute your %PATH% by putting everything in it? Suffer no more - this application is for you!
