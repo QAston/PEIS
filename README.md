@@ -1,4 +1,4 @@
-# Portable Environment Initialisation Scripts (for Windows)
+# Portable Environment Initialization Scripts (for Windows)
 
 ## Who needs this?
 
@@ -78,19 +78,21 @@ Each [scripts] map entry is a script which will be converted to a `env_NAME.bat`
 {command = 'type', options...}
 ```
 Currently there are 2 types of commands:
+
 1. Source - sources `SCRIPTNAME` script from the map for convenient reuse
-```
-{command = 'source', env = 'SCRIPTNAME'}
-```
+    ```
+    {command = 'source', env = 'SCRIPTNAME'}
+    ```
+
 2. Env - modifies environment variable `ENV_KEY` using `ENV_VALUE`. 
-```
-{command = 'env', key = 'ENV_KEY', value = 'ENV_VALUE', mode = 'MODE'}
-```
-`ENV_VALUE` can contain windows env variable notation `%VARIABLE%`, which will be replaced with correct notation for each shell. `MODE` can have 4 values: 
-- `SET` (just sets the variable value), 
-- `PATH` (sets the variable value assuming it's a fs location, corrects for different path representations in shells), 
-- `PREPEND_PATH` (like path, but prepends to existing variable value), 
-- `APPEND_PATH` (like path, but appends to existing variable value).
+    ```
+    {command = 'env', key = 'ENV_KEY', value = 'ENV_VALUE', mode = 'MODE'}
+    ```
+    `ENV_VALUE` can contain windows env variable notation `%VARIABLE%`, which will be replaced with correct notation for each shell. `MODE` can have 4 values: 
+    - `SET` (just sets the variable value), 
+    - `PATH` (sets the variable value assuming it's a fs location, corrects for different path representations in shells), 
+    - `PREPEND_PATH` (like path, but prepends to existing variable value), 
+    - `APPEND_PATH` (like path, but appends to existing variable value).
 
 ## Development 
 
