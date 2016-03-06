@@ -1,0 +1,5 @@
+Thumbs.db
+.settings
+.project
+target
+Cargo.lock

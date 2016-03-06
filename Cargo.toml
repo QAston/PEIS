@@ -1,0 +1,14 @@
+[package]
+
+name = "portable_env"
+version = "0.1.0"
+authors = [ "Dariusz Antoniuk <qaston@gmail.com>" ]
+
+[[bin]]
+
+name = "portable_env"
+
+[dependencies]
+docopt = "*"
+rustc-serialize = "*"
+toml = "0.1"
