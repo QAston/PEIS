@@ -16,6 +16,7 @@ Options:
 ```
 
 When run, the application generates 3 directories: `bash`, `cmd`, `ps`, each one contaning environment setup scripts for the respective shell. The directories contain scripts generated according to specifications in the config file.
+
 Example specification:
 
 ```toml
@@ -85,7 +86,11 @@ Currently there are 2 types of commands:
 ```
 {command = 'env', key = 'ENV_KEY', value = 'ENV_VALUE', mode = 'MODE'}
 ```
-`ENV_VALUE` can contain windows env variable notation `%VARIABLE%`, which will be replaced with correct notation for each shell. `MODE` can have 4 values: `SET` (just sets the variable value), `PATH` (sets the variable value assuming it's a fs location, corrects for different path representations in shells), `PREPEND_PATH` (like path, but prepends to existing variable value), `APPEND_PATH` (like path, but appends to existing variable value).
+`ENV_VALUE` can contain windows env variable notation `%VARIABLE%`, which will be replaced with correct notation for each shell. `MODE` can have 4 values: 
+- `SET` (just sets the variable value), 
+- `PATH` (sets the variable value assuming it's a fs location, corrects for different path representations in shells), 
+- `PREPEND_PATH` (like path, but prepends to existing variable value), 
+- `APPEND_PATH` (like path, but appends to existing variable value).
 
 ## Development 
 
