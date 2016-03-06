@@ -93,6 +93,23 @@ Currently there are 2 types of commands:
     - `PATH` (sets the variable value assuming it's a fs location, corrects for different path representations in shells), 
     - `PREPEND_PATH` (like path, but prepends to existing variable value), 
     - `APPEND_PATH` (like path, but appends to existing variable value).
+    
+## Using generated scripts
+
+Add generated directories to PATH of your batch, bash and powershell shells. Then you can use generated scripts by simply sourcing them:
+
+1. Bash: 
+    ```
+    . env_jdk17.sh
+    ```
+2. Batch:
+    ```
+    env_jdk17
+    ```
+3. Powershell:
+    ```
+    . env_jdk17.ps1
+    ```
 
 ## Development 
 
