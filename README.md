@@ -112,6 +112,37 @@ Add generated directories to PATH of your batch, bash and powershell shells. The
     ```
     . env_jdk17.ps1
     ```
+    
+## Adding generated scripts to %PATH% of your shell
+
+Your shell needs a way to find the generated scripts before you can use them. Here's how to configure that. Replace %OUTPUT_DIR% in the following guide with the directory in which you've generated the scripts.
+
+### Batch
+
+Just add `;%OUTPUT_DIR%/cmd` to your user %PATH% environment variable. Since you've found this project you probably already know how to do that. In case you don't, press [win] + Q, type env, [enter], click environment variables button and add an entry there.
+
+### Powershell
+
+Powershell has a default security policy which disables running scripts. You have enable running script files first, which is described in this guide: https://technet.microsoft.com/en-us/library/bb613481.aspx .
+
+After that you need to set up your $env:PATH and $env:PATHEXT variable values for your shells. It's easiest to do that by creating a script file `%USERPROFILE%\Documents\WindowsPowerShell\profile.ps1` with the following contents:
+```powershell
+# allows your scripts to be found in path
+$env:PATH="%OUTPUT_DIR%\ps;$env:PATH"
+$env:PATHEXT=".PS1;$env:PATHEXT"
+```
+
+More info about powershell profiles can be found here:
+https://technet.microsoft.com/en-us/library/bb613488(v=vs.85).aspx
+
+### Bash
+
+Exact details of setup for bash vary for each bash distribution. It's common however that bash shells execute `~/.bashrc` on startup. To add the generated scripts to the PATH variable you need to append the a variation of the following line to your `~/.bashrc`:
+```bash
+export PATH=`/%OUTPUT_DIR%/bash`:${PATH}
+```
+
+%OUTPUT_DIR% should be a proper unix path to the dir in which there are generated scripts.
 
 ## Development 
 
