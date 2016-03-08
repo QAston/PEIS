@@ -139,7 +139,7 @@ https://technet.microsoft.com/en-us/library/bb613488(v=vs.85).aspx
 
 Exact details of setup for bash vary for each bash distribution. It's common however that bash shells execute `~/.bashrc` on startup. To add the generated scripts to the PATH variable you need to append the a variation of the following line to your `~/.bashrc`:
 ```bash
-export PATH=`/%OUTPUT_DIR%/bash`:${PATH}
+export PATH="/%OUTPUT_DIR%/bash:${PATH}"
 ```
 
 %OUTPUT_DIR% should be a proper unix path to the dir in which there are generated scripts.
