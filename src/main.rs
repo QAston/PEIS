@@ -153,14 +153,14 @@ fn generate_mod_env(name: &str, value: &str, m: ModType, e: EnvType) -> String {
     match e {
         EnvType::CMD => format!("set {}={}\r\n", name, &mod_env_val),
         EnvType::POWERSHELL => format!("$env:{}=\"{}\"\r\n", name, &mod_env_val),
-        EnvType::BASH => format!("export {}={}\r\n", name, &mod_env_val),
+        EnvType::BASH => format!("export {}={}\n", name, &mod_env_val),
     }
 }
 
 fn generate_src_env(file_to_src: &Path, e: EnvType) -> String {
     match e {
         EnvType::CMD => format!("call %~dp0\\{}\r\n", file_to_src.display()),
-        EnvType::BASH => format!("source {}\r\n", file_to_src.display()),
+        EnvType::BASH => format!("source {}\n", file_to_src.display()),
         EnvType::POWERSHELL => format!(". {}\r\n", file_to_src.display()),
     }
 }
