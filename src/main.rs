@@ -43,7 +43,7 @@ enum EnvType {
 fn generate_fix_path(path: &str, t: EnvType) -> String {
     match t {
         EnvType::CMD | EnvType::POWERSHELL => format!("{}", path),
-        EnvType::BASH => format!("`cygpath -p  '{}'`", escape_bash_vars(path))
+        EnvType::BASH => format!("`cygpath -p  \"{}\"`", escape_bash_vars(path))
     }
 }
 
