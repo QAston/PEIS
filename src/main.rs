@@ -128,6 +128,13 @@ fn test_transform_vars_fail2() {
     transform_vars("a%%ASD%b", EnvType::BASH);
 }
 
+fn generate_mod_env_set_value(eval_value: &str, t: EnvType) -> String {
+    match t {
+        EnvType::CMD | EnvType::POWERSHELL => format!("{}", eval_value),
+        EnvType::BASH => format!("'{}'", &eval_value),
+    }
+}
+
 fn generate_mod_env_value(name: &str, value: &str, m: ModType, e: EnvType) -> String {
     let eval_value = transform_vars(value, e);
     match m {
@@ -143,7 +150,7 @@ fn generate_mod_env_value(name: &str, value: &str, m: ModType, e: EnvType) -> St
             s.push_str(&generate_fix_path(&eval_value,e));
             s
         },
-        ModType::SET => eval_value,
+        ModType::SET => generate_mod_env_set_value(&eval_value,e),
         ModType::PATH => generate_fix_path(&eval_value,e),
     }
 }
