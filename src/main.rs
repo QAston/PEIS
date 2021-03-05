@@ -2,11 +2,10 @@
 // portable_env.toml describes actions to take when command is executed
 // to use this for libraries use https://gcc.gnu.org/onlinedocs/gcc/Environment-Variables.html
 // LIBRARY_PATH, CPATH
-extern crate rustc_serialize;
 extern crate toml;
 extern crate docopt;
 
-use rustc_serialize::Decodable;
+use serde_derive::Deserialize;
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
@@ -23,8 +22,10 @@ Options:
     --output=DIR  Where to put output script directories. [default: .]
 ";
 
+static AUTOREMOVE_MARKER: &'static str = "this-file-is-marked-for-removal-on-generation";
+
 #[derive(Clone,Copy)]
-#[derive(RustcDecodable)]
+#[derive(Deserialize)]
 #[allow(non_camel_case_types)]
 enum ModType {
     PREPEND_PATH,
@@ -172,12 +173,12 @@ fn generate_src_env(file_to_src: &Path, e: EnvType) -> String {
     }
 }
 
-#[derive(RustcDecodable)]
+#[derive(Deserialize)]
 struct Config  {
     scripts: HashMap<String, Vec<std::collections::HashMap<String, String>>>,
 }
 
-#[derive(RustcDecodable)]
+#[derive(Deserialize)]
 struct Args {
     flag_config: String,
     flag_output: String,
@@ -221,6 +222,17 @@ fn generate_script(script_name_pair: &(String, Vec<std::collections::HashMap<Str
     };
     
     let mut out_content = String::new();
+    match e {
+        EnvType::CMD => {
+            out_content.push_str(&format!("@rem {}\r\n", AUTOREMOVE_MARKER));
+        },
+        EnvType::BASH => {
+            out_content.push_str(&format!("# {}\n", AUTOREMOVE_MARKER));
+        }
+        EnvType::POWERSHELL => {
+            out_content.push_str(&format!("# {}\r\n", AUTOREMOVE_MARKER));
+        }
+    }
     for command in cmds {
         match &command.get("command").unwrap()[..] { 
             "env" => {
@@ -244,72 +256,36 @@ fn generate_script(script_name_pair: &(String, Vec<std::collections::HashMap<Str
                                                    Error::description(&why))
     }
 }
-#[cfg(test)]
-static EXAMPLE_TOML: &'static str = r"
-[scripts]
-ant = [
-    {command = 'source', env = 'jdk17'},
-    {command = 'env', key = 'ANT_HOME', value = 'C:\portable\ant-1.9', mode = 'PATH'},
-    {command = 'env', key = 'PATH', value = '%ANT_HOME%\bin', mode = 'PREPEND_PATH'}
-]
-cmake = [
-    {command = 'env', key = 'PATH', value = 'C:\Program Files (x86)\CMake 2.8\bin', mode = 'PREPEND_PATH'}
-]
-jdk17 = [
-    {command = 'env', key = 'JAVA_HOME', value = 'C:\Program Files\Java\jdk17', mode = 'PATH'},
-    {command = 'env', key = 'JRE_HOME', value = 'C:\Program Files\Java\jdk17\jre', mode = 'PATH'},
-    {command = 'env', key = 'PATH', value = '%JAVA_HOME%\jre\bin', mode = 'PREPEND_PATH'},
-    {command = 'env', key = 'PATH', value = '%JAVA_HOME%\bin', mode = 'PREPEND_PATH'}
-]
-jdk18 = [
-    {command = 'env', key = 'JAVA_HOME', value = 'C:\Program Files\Java\jdk18', mode = 'PATH'},
-    {command = 'env', key = 'JRE_HOME', value = 'C:\Program Files\Java\jdk18\jre', mode = 'PATH'},
-    {command = 'env', key = 'PATH', value = '%JAVA_HOME%\jre\bin', mode = 'PREPEND_PATH'},
-    {command = 'env', key = 'PATH', value = '%JAVA_HOME%\bin', mode = 'PREPEND_PATH'}
-]
-openssl32 = [
-    {command = 'env', key = 'PATH', value = 'C:\OpenSSL-Win32\bin', mode = 'PREPEND_PATH'},
-    # for mingw
-    {command = 'env', key = 'CPATH', value = 'C:\OpenSSL-Win32\include', mode = 'PREPEND_PATH'},
-    {command = 'env', key = 'LIBRARY_PATH', value = 'C:\OpenSSL-Win32\lib', mode = 'PREPEND_PATH'},
-    {command = 'env', key = 'LIBRARY_PATH', value = 'C:\OpenSSL-Win32\lib\MinGW', mode = 'PREPEND_PATH'},
-    #for vcpp
-    {command = 'env', key = 'INCLUDE', value = 'C:\OpenSSL-Win32\include', mode = 'PREPEND_PATH'},
-    {command = 'env', key = 'LIB', value = 'C:\OpenSSL-Win32\lib', mode = 'PREPEND_PATH'},
-    {command = 'env', key = 'LIB', value = 'C:\OpenSSL-Win32\lib\VC', mode = 'PREPEND_PATH'}
-]
-putty = [
-    {command = 'env', key = 'PATH', value = 'C:\portable\putty', mode = 'PREPEND_PATH'}
-]
-git = [
-    {command = 'env', key = 'PATH', value = 'C:\Program Files\Git\cmd', mode = 'PREPEND_PATH'}
-]
-maven = [
-    {command = 'source', env = 'jdk17'},
-    {command = 'env', key = 'M2_HOME', value = 'C:\portable\maven', mode = 'PATH'},
-    {command = 'env', key = 'PATH', value = '%M2_HOME%\bin', mode = 'PREPEND_PATH'}
-]
-mingw64 = [
-    {command = 'env', key = 'MSYS_HOME', value = 'C:\portable\msys', mode = 'PATH'},
-    {command = 'env', key = 'PATH', value = '%MSYS_HOME%/mingw64/bin;%MSYS_HOME%/usr/local/bin;%MSYS_HOME%/usr/bin;%MSYS_HOME%/bin', mode = 'PREPEND_PATH'}
-]
-msys = [
-    {command = 'env', key = 'MSYS_HOME', value = 'C:\portable\msys', mode = 'PATH'},
-    {command = 'env', key = 'PATH', value = '%MSYS_HOME%/usr/local/bin;%MSYS_HOME%/usr/bin;%MSYS_HOME%/bin', mode = 'PREPEND_PATH'}
-]";
 
-#[test]
-#[allow(unused_variables)]
-fn test_parse_config() {
-    let mut parser = toml::Parser::new(EXAMPLE_TOML);
-    parser.parse();
-    println!("{:?}", parser.errors);
+fn remove_old_scripts(dir: &str) {
+    for &subdir in ["cmd", "ps", "bash"].iter() {
+        let p = &[&dir, subdir].iter().collect::<PathBuf>();
+        if !Path::exists(p) {
+            continue;
+        }
+        for entry in std::fs::read_dir(p).unwrap() {
+            let entry = entry.unwrap();
+            let path = &entry.path();
+            if path.is_file() && path.file_name().unwrap().to_string_lossy().starts_with("env_") {
+                let mut line = String::new();
+                {
+                    let f = File::open(path).unwrap();
+                    let mut f = std::io::BufReader::new(f);
+                    f.read_line(&mut line).unwrap();
+                }
+
+                if line.contains(AUTOREMOVE_MARKER) {
+                    std::fs::remove_file(path).unwrap();
+                }
+            }
+        }
+    }
 }
 
 
 fn main() {
     let args: Args = Docopt::new(USAGE)
-                            .and_then(|d| d.decode())
+                            .and_then(|d| d.deserialize())
                             .unwrap_or_else(|e| e.exit());
 
     let config_path = Path::new(&args.flag_config);
@@ -326,7 +302,9 @@ fn main() {
                                                    Error::description(&why))
     }
 
-    let data: Config = toml::decode_str(&config_string).unwrap();
+    remove_old_scripts(&args.flag_output[..]);
+
+    let data: Config = toml::from_str(&config_string).unwrap();
     for script in data.scripts {
         for env in &[EnvType::CMD, EnvType::BASH, EnvType::POWERSHELL] {
             generate_script(&script, &args.flag_output[..], *env);
